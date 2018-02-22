@@ -1,6 +1,6 @@
 {
   "name": "basic-cursors",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "basic set of functional cursors",
   "main": "dist/index.min.js",
   "typings": "dist/index.d.ts",
