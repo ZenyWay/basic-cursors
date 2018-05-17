@@ -8,19 +8,19 @@ basic set of functional cursors:
 
 # Examples
 see all [examples](./examples) in this directory.
-run the examples [in your browser](https://cdn.rawgit.com/ZenyWay/basic-cursors/v1.0.0/examples/index.html).
+run the examples [in your browser](https://cdn.rawgit.com/ZenyWay/basic-cursors/v2.0.0/examples/index.html).
 
 `propCursor`:
 ```ts
 // set cursor on foo property
-const fooCursor = propCursor<{},number>('foo')
+const fooCursor = propCursor('foo')
 
-of(
+Observable.of(
   { foo: 1, b: 5 },
   { foo: 7, b: 3 }
 )
 .pipe(
-  map(fooCursor(v => v + 1)) // increment value of `foo` property
+  map(fooCursor((v?: any) => +v + 1)) // increment value of `foo` property
 )
 .subscribe(debug('output:'))
 ```
@@ -29,13 +29,15 @@ generic `cursor`:
 ```ts
 // set cursor at .foo.bar
 const fooBarCursor = cursor(peekFooBar, pokeFooBar)
+// alternatively, using compose, e.g. from the 'basic-compose' module:
+// const fooBarCursor = compose(propCursor('foo'), propCursor('bar'))
 
-of(
+Observable.of(
   { foo: { a: 1, bar: 3 }, b: 5 },
   { foo: { a: 2, bar: 5 }, b: 7 }
 )
 .pipe(
-  map(fooBarCursor(v => 2 * v)) // double value at .foo.bar
+  map(fooBarCursor((v?: any) => 2 * +v)) // double value at .foo.bar
 )
 .subscribe(debug('output:'))
 
@@ -52,22 +54,34 @@ function pokeFooBar (v, o) {
 
 # API
 ```ts
-declare function cursor<P, C = {}, V = C, O = P & Prop<C>>(
-  peek: (p: P) => C,
-  poke: (v: V, p: P) => O = (v: V, p: P) => v // default to identity function
-): (fn: (c: C) => V) => (p: P) => O
+export default function cursor<I, C, O = I, D = C>(
+  peek: (p?: I) => C,
+  poke?: (p: I, c?: D) => O
+): (fn?: (c?: C) => D) => (p?: I) => O
 
-declare function propCursor<P, C = {}, V = C>(
-  k: string
-): (fn: (c: C) => V) => (p: P) => P & { [x: string]: V }
+export declare function propCursor<K extends string>(k: K): PropCursor<K>
 
-declare function into<P, V>(
-  key: string
-): (fn: (c: P) => V) => (p: P) => P & Prop<V>
+export declare type PropCursor<K extends string> =
+  <P extends Partial<Record<K, P[K]>>, V>(
+    fn: (v: P[K]) => V
+  ) => (p?: P) => P & Record<K, V>
 
-interface Prop<V> {
-  [k: string]: V
-}
+export declare function into<K extends string>(key: K): IntoCursor<K>
+
+export declare type IntoCursor<K extends string> =
+  <P extends Partial<Record<K, P[K]>>, V>(
+    fn: (p: P) => V
+  ) => (p?: P) => P & Record<K, V>
+
+export declare function peekProp<K extends string>(
+  k: K
+): <P extends Partial<Record<K, P[K]>>>(p?: P) => P[K]
+
+export declare function pokeProp<K extends string>(
+  k: K
+): <P, V>(p: P & Partial<Record<K, any>>, v?: V) => P & Record<K, V>
+
+export declare function identity<V>(v: V): V
 ```
 
 # TypeScript

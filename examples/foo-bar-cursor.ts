@@ -13,32 +13,27 @@
  * Limitations under the License.
  */
 ;
-import { cursor } from '../'
+import { propCursor } from '../'
 import log from './console'
+import compose from 'basic-compose'
+import { of as observableOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { of } from 'rxjs/observable/of'
 
-log('example:')('double value at `foo.bar` path in objects from stream (generic cursor)')
+log('example:')('double value at `foo.bar` path in objects from stream (prop cursor)')
 
+interface FooBar<T> {
+  foo: { bar: T }
+}
 // set cursor at .foo.bar
-const fooBarCursor = cursor(peekFooBar, pokeFooBar)
+const fooBarCursor: <T>(fn: (v?: any) => T) => (p?: FooBar<any>) => FooBar<T> =
+  compose.into(0)(propCursor('foo'), propCursor('bar'))
 
-of(
+observableOf(
   { foo: { a: 1, bar: 3 }, b: 5 },
   { foo: { a: 2, bar: 5 }, b: 7 }
 )
 .pipe(
   tap(log('input:')),
-  map(fooBarCursor(v => 2 * v)) // double value at .foo.bar
+  map(fooBarCursor((v: any) => 2 * +v)) // double value at .foo.bar
 )
 .subscribe(log('output:'))
-
-function peekFooBar (o: any) {
-  return o && o.foo && o.foo.bar
-}
-
-function pokeFooBar (v, o) {
-  return Object.assign({}, o, {
-    foo: Object.assign({}, o && o.foo, { bar: v })
-  })
-}

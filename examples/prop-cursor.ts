@@ -15,20 +15,20 @@
 ;
 import { propCursor } from '../'
 import log from './console'
+import { of as observableOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { of } from 'rxjs/observable/of'
 
 log('example:')('increment value of `foo` property in objects from stream (shallow cursor)')
 
 // set cursor on foo property
-const fooCursor = propCursor<{},number>('foo')
+const fooCursor = propCursor('foo')
 
-of(
+observableOf(
   { foo: 1, b: 5 },
   { foo: 7, b: 3 }
 )
 .pipe(
   tap(log('input:')),
-  map(fooCursor(v => v + 1)) // increment value of `foo` property
+  map(fooCursor((v?: any) => +v + 1)) // increment value of `foo` property
 )
 .subscribe(log('output:'))

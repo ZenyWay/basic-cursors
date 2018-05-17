@@ -14,10 +14,10 @@
  * Limitations under the License.
  */
 //
-const cursor = require('../').cursor
 const propCursor = require('../').propCursor
+const compose = require('basic-compose').default
+const observableOf = require('rxjs').of
 const map = require('rxjs/operators').map
-const of = require('rxjs/observable/of').of
 
 describe('cursor:', function () {
   describe('example: double value at `foo.bar` path in objects from stream', function () {
@@ -27,9 +27,9 @@ describe('cursor:', function () {
 
     beforeEach(function () {
       // set cursor at .foo.bar
-      const fooBarCursor = cursor(peekFooBar, pokeFooBar)
+      const fooBarCursor = compose.into(0)(propCursor('foo'), propCursor('bar'))
 
-      of(
+      observableOf(
         { foo: { a: 1, bar: 3 }, b: 5 },
         { foo: { a: 2, bar: 5 }, b: 7 }
       )
@@ -47,10 +47,23 @@ describe('cursor:', function () {
       expect(complete).toHaveBeenCalledTimes(1)
     })
   })
+  describe('when the function applied to a Cursor returns its given argument as is:',
+  function () {
+    let arg, result
+
+    beforeEach(function () {
+      arg = { foo: 'foo', bar: 'bar' }
+      result = propCursor('foo')(v => v)(arg)
+    })
+
+    it('returns the given parent object as is.', function () {
+      expect(result).toBe(arg)
+    })
+  })
 })
 
 describe('shallowCursor:', function () {
-  describe('example: incremete value of property `foo` in objects from stream', function () {
+  describe('example: increment value of property `foo` in objects from stream', function () {
     let next = jasmine.createSpy('next')
     let error = jasmine.createSpy('error')
     let complete = jasmine.createSpy('complete')
@@ -59,7 +72,7 @@ describe('shallowCursor:', function () {
       // set cursor on foo property
       const fooCursor = propCursor('foo')
 
-      of(
+      observableOf(
         { foo: 1, b: 5 },
         { foo: 7, b: 3 }
       )
@@ -78,13 +91,3 @@ describe('shallowCursor:', function () {
     })
   })
 })
-
-function peekFooBar (o) {
-  return o && o.foo && o.foo.bar
-}
-
-function pokeFooBar (v, o) {
-  return Object.assign({}, o, {
-    foo: Object.assign({}, o && o.foo, { bar: v })
-  })
-}
