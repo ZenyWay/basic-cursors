@@ -6,6 +6,8 @@ basic set of functional cursors:
 * `propCursor`: a property cursor factory
 * `into`: a cursor for upserting a property based on the complete object
 
+these cursors can also be applied to reducers.
+
 # Examples
 see all [examples](./examples) in this directory.
 run the examples [in your browser](https://cdn.rawgit.com/ZenyWay/basic-cursors/v2.0.0/examples/index.html).
@@ -57,21 +59,19 @@ function pokeFooBar (v, o) {
 export default function cursor<I, C, O = I, D = C>(
   peek: (p?: I) => C,
   poke?: (p: I, c?: D) => O
-): (fn?: (c?: C) => D) => (p?: I) => O
+): (fn?: (c?: C, ...args: any[]) => D) => (p?: I, ...args: any[]) => O
 
 export declare function propCursor<K extends string>(k: K): PropCursor<K>
-
 export declare type PropCursor<K extends string> =
   <P extends Partial<Record<K, P[K]>>, V>(
-    fn: (v: P[K]) => V
-  ) => (p?: P) => P & Record<K, V>
+    fn: (v: P[K], ...args: any[]) => V
+  ) => (p?: P, ...args: any[]) => P & Record<K, V>
 
 export declare function into<K extends string>(key: K): IntoCursor<K>
-
 export declare type IntoCursor<K extends string> =
   <P extends Partial<Record<K, P[K]>>, V>(
-    fn: (p: P) => V
-  ) => (p?: P) => P & Record<K, V>
+    fn: (p: P, ...args: any[]) => V
+  ) => (p?: P, ...args: any[]) => P & Record<K, V>
 
 export declare function peekProp<K extends string>(
   k: K

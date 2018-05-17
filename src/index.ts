@@ -46,11 +46,11 @@ export default function cursor<I,C,O=I,D=C>(
   poke = identity as (p: I, c?: D) => O
 ) {
   return function (
-    fn = identity as (c?: C) => D
+    fn = identity as (c?: C, ...args: any[]) => D
   ) {
-    return function (p?: I): O {
+    return function (p?: I, ...args: any[]): O {
       const v = peek(p)
-      const u = fn(v)
+      const u = fn(v, ...args)
       return u === v as any ? p as any : poke(p, u)
     }
   }
@@ -62,8 +62,8 @@ export function propCursor <K extends string>(k: K): PropCursor<K> {
 
 export type PropCursor<K extends string> =
   <P extends Partial<Record<K, P[K]>>, V>(
-    fn: (v: P[K]) => V
-  ) => (p?: P) => P & Record<K, V>
+    fn: (v: P[K], ...args: any[]) => V
+  ) => (p?: P, ...args: any[]) => P & Record<K, V>
 
 /**
  * a cursor that applies a given function to objects
@@ -78,8 +78,8 @@ export function into <K extends string>(key: K): IntoCursor<K> {
 
 export type IntoCursor<K extends string> =
   <P extends Partial<Record<K, P[K]>>, V>(
-    fn: (p: P) => V
-  ) => (p?: P) => P & Record<K,V>
+    fn: (p: P, ...args: any[]) => V
+  ) => (p?: P, ...args: any[]) => P & Record<K,V>
 
 export function peekProp <K extends string>(k: K) {
   return function <P extends Partial<Record<K,P[K]>>>(p?: P): P[K] {
