@@ -89,7 +89,9 @@ export function peekProp <K extends string>(k: K) {
 
 export function pokeProp <K extends string>(k: K) {
   return function <P, V>(p: P & Partial<Record<K,any>>, v?: V): P & Record<K,V> {
-    return Object.assign({} as P & Record<K,V>, p, { [k]: v })
+    return (p && p[k]) === v as any
+      ? p as P & Record<K,V>
+      : Object.assign({} as P & Record<K,V>, p, { [k]: v })
   }
 }
 

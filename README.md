@@ -10,7 +10,7 @@ these cursors can also be applied to reducers.
 
 # Examples
 see all [examples](./examples) in this directory.
-run the examples [in your browser](https://cdn.rawgit.com/ZenyWay/basic-cursors/v2.0.0/examples/index.html).
+run the examples [in your browser](https://cdn.rawgit.com/ZenyWay/basic-cursors/v2.2.0/examples/index.html).
 
 `propCursor`:
 ```ts
