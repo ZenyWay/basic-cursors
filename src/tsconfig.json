@@ -4,15 +4,7 @@
     "target": "es2015",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": [
-      "es2015",
-      "dom"
-    ],
-    "types": [
-			"inferno"
-    ],
-		"jsx": "react",
-		"jsxFactory": "createElement",
+    "lib": ["es2015", "dom"],
     "declaration": true,
     "sourceMap": false,
     "noEmitHelpers": false,
@@ -23,10 +15,5 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true
   },
-  "exclude": [
-    "dist",
-    "node_modules",
-    "spec",
-    "typings"
-  ]
+  "exclude": ["dist", "node_modules", "spec", "typings"]
 }

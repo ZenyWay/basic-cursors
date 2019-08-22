@@ -1,7 +1,7 @@
 'use strict' /* eslint-env jasmine */
 /**
  * @license
- * Copyright 2018 Stephane M. Catala
+ * Copyright 2019 Stephane M. Catala
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,28 +27,30 @@ describe('cursor:', function () {
 
     beforeEach(function () {
       // set cursor at .foo.bar
-      const fooBarCursor = compose.into(0)(propCursor('foo'), propCursor('bar'))
+      const fooBarCursor = compose(
+        propCursor('foo'),
+        propCursor('bar')
+      )
 
       observableOf(
         { foo: { a: 1, bar: 3 }, b: 5 },
         { foo: { a: 2, bar: 5 }, b: 7 }
       )
-      .pipe(
-        map(fooBarCursor(v => 2 * v)) // double value at .foo.bar
-      )
-      .subscribe(next, error, complete)
+        .pipe(
+          map(fooBarCursor(v => 2 * v)) // double value at .foo.bar
+        )
+        .subscribe(next, error, complete)
     })
     it('runs as expected', function () {
       expect(next.calls.allArgs()).toEqual([
-        [ { foo: { a: 1, bar: 6 }, b: 5 } ],
-        [ { foo: { a: 2, bar: 10 }, b: 7 } ]
+        [{ foo: { a: 1, bar: 6 }, b: 5 }],
+        [{ foo: { a: 2, bar: 10 }, b: 7 }]
       ])
       expect(error).not.toHaveBeenCalled()
       expect(complete).toHaveBeenCalledTimes(1)
     })
   })
-  describe('when the function applied to a Cursor returns its given argument as is:',
-  function () {
+  describe('when the function applied to a Cursor returns its given argument as is:', function () {
     let arg, result
 
     beforeEach(function () {
@@ -72,19 +74,16 @@ describe('shallowCursor:', function () {
       // set cursor on foo property
       const fooCursor = propCursor('foo')
 
-      observableOf(
-        { foo: 1, b: 5 },
-        { foo: 7, b: 3 }
-      )
-      .pipe(
-        map(fooCursor(v => v + 1)) // increment value of `foo` property
-      )
-      .subscribe(next, error, complete)
+      observableOf({ foo: 1, b: 5 }, { foo: 7, b: 3 })
+        .pipe(
+          map(fooCursor(v => v + 1)) // increment value of `foo` property
+        )
+        .subscribe(next, error, complete)
     })
     it('runs as expected', function () {
       expect(next.calls.allArgs()).toEqual([
-        [ { foo: 2, b: 5 } ],
-        [ { foo: 8, b: 3 } ]
+        [{ foo: 2, b: 5 }],
+        [{ foo: 8, b: 3 }]
       ])
       expect(error).not.toHaveBeenCalled()
       expect(complete).toHaveBeenCalledTimes(1)

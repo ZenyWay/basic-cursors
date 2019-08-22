@@ -12,6 +12,5 @@
  * See the License for the specific language governing permissions and
  * Limitations under the License.
  */
-;
 import './foo-bar-cursor'
 import './prop-cursor'

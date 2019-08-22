@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Stephane M. Catala
+ * Copyright 2019 Stephane M. Catala
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,23 +12,26 @@
  * See the License for the specific language governing permissions and
  * Limitations under the License.
  */
-;
 import { propCursor } from '../'
 import log from './console'
 import { of as observableOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 
-log('example:')('increment value of `foo` property in objects from stream (shallow cursor)')
+log('example:')(
+  'increment value of `foo` property in objects from stream (shallow cursor)'
+)
 
 // set cursor on foo property
 const fooCursor = propCursor('foo')
 
-observableOf(
-  { foo: 1, b: 5 },
-  { foo: 7, b: 3 }
-)
-.pipe(
-  tap(log('input:')),
-  map(fooCursor((v?: any) => +v + 1)) // increment value of `foo` property
-)
-.subscribe(log('output:'))
+interface Foo<T> {
+  foo: T
+  b: number
+}
+
+observableOf<Foo<number>>({ foo: 1, b: 5 }, { foo: 7, b: 3 })
+  .pipe(
+    tap<Foo<number>>(log('input:')),
+    map(fooCursor(v => +v + 1)) // increment value of `foo` property
+  )
+  .subscribe(log('output:'))
